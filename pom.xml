@@ -19,6 +19,7 @@
     <modules>
         <module>calculation</module>
         <module>creditCardApply</module>
+        <module>insuranceInfoCheck</module>
     </modules>
 
     <dependencies>
