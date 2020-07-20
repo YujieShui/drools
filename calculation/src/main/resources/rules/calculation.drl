@@ -1,17 +1,29 @@
 package calculation
 import com.shuiyujie.drools.entity.Calculation
+/*
+    规则文件分成三类：
+    1、计算应纳税所得额
+    2、设置税率、速算扣除数
+    3、计算税后工资
 
+    这 3 步是需要顺序执行的，那就应该给他们设置优先级，用 salience 属性
+    这套计算规则是 2011 的计算方法，可以设置一个生效时间，用 date-effective 属性
+*/
 rule "个人所得税：计算应纳税所得额"
     enabled true
-    salience 3
-    no-loop true
+    salience 3  // 优先级，有些步骤要先执行
+    no-loop true // 由于 update() 的时候会重新匹配规则，那么还是会先匹配到这条优先级最高，且符合规则的
+                // 使用 no-loop 就可以跳出循环，避免死循环
     date-effective "2011-09-01" //生效日期
     when
         $cal : Calculation(wage>0)
     then
         $cal.setWagemore($cal.getWage()-3500);
-        update($cal);
+        update($cal);   // 计算完之后，更新工作内存中的对象
 end
+
+
+// 后面这些规则都是用来设置税率的了，salience 2
 rule "个人所得税：设置税率-->>应纳税所得额<=1500"
     salience 2
     no-loop true
